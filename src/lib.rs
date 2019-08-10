@@ -60,7 +60,8 @@ fn copy_files(files: Vec<PathBuf>, path: PathBuf) {
         output_path.push(string);
         if !output_path.exists() {
             fs::copy(&*file, output_path).unwrap();
-            println!("Copied: {:?}", string);
+            fs::remove_file(&*file).unwrap();
+            println!("Moved: {:?}", string);
         } else {
             println!("File named {:?} already exists.", string);
         }
