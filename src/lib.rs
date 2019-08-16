@@ -17,8 +17,8 @@ pub struct Config {
     #[structopt(short = "o", long = "output", parse(from_os_str))]
     output_directory: PathBuf,
 
-    /// Extension of the files to copy
-    #[structopt(short = "e", long = "ext")]
+    /// Extension of the files to copy, defaults to all files.
+    #[structopt(short = "e", long = "ext", default_value = "")]
     file_ext: String,
 }
 
@@ -43,15 +43,16 @@ fn create_glob_pattern(path: PathBuf, extension: &str) -> String {
 }
 
 fn find_files(pattern: &str) -> Vec<PathBuf> {
-    let mut files = vec![];
     match glob(pattern) {
-        Ok(iter) => iter.for_each(|file| {
-            let file = file.unwrap();
-            files.push(file);
-        }),
-        Err(err) => println!("Error: {}", err),
-    };
-    files
+        Ok(iter) => iter
+            .map(|path| path.unwrap())
+            .filter(|path| path.is_file())
+            .collect(),
+        Err(err) => {
+            println!("Error: {}", err);
+            Vec::new()
+        }
+    }
 }
 
 fn copy_files(files: Vec<PathBuf>, path: PathBuf) {
