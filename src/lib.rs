@@ -2,6 +2,7 @@ extern crate structopt;
 
 use std::fs;
 use std::path::PathBuf;
+use std::process;
 
 use glob::glob;
 use structopt::StructOpt;
@@ -26,12 +27,12 @@ pub fn run(config: Config) {
     let files = find_files(&pattern);
     if files.is_empty() {
         println!("Didn't find any files with {} extension.", &config.file_ext);
-    } else {
-        if !&config.output_directory.exists() {
-            fs::create_dir(&config.output_directory).unwrap();
-        }
-        copy_files(files, config.output_directory);
+        process::exit(1);
     }
+    if !&config.output_directory.exists() {
+        fs::create_dir(&config.output_directory).unwrap();
+    }
+    copy_files(files, config.output_directory);
 }
 
 fn create_glob_pattern(path: PathBuf, extension: &str) -> String {
