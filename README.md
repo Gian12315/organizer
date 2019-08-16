@@ -1,6 +1,7 @@
 # Organizer  
 
-A simple program that will help you organize a folder by file extensions (if not provided, it will default to all files).
+A simple program that will help you organize a folder by moving your files to another folder you specify.  
+By specifying a file extension you filter the files moved.
 
 ## Why would you use this?  
 * Because your folder is full of files and everytime you want to organize the folder, the explorer gets slow or crashes (My case)
