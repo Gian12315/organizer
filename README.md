@@ -9,4 +9,4 @@ By specifying a file extension you filter the files moved.
 
 ## How to run?
 Go to the executable directory via command line and use organizer.exe --help  
-It will give you a small documentation of how to use it.
+It will give you a small documentation of how to use it, extension argument must contain a dot at the start (example: ".txt"), working directory must be a valid, existent path and the output directory must be a valid path, if the folder doesn't exist, it will be created.
