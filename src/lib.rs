@@ -17,22 +17,24 @@ pub struct Config {
     #[structopt(short = "o", long = "output", parse(from_os_str))]
     output_directory: PathBuf,
 
-    /// Extension of the files to copy, defaults to all files.
-    #[structopt(short = "e", long = "ext", default_value = "")]
+    /// Extension of the files to copy,
+    /// in order to copy all files, without checking the extension
+    /// give the argument the value of "" (an empty string)
+    #[structopt(short = "e", long = "ext")]
     file_ext: String,
 }
 
 pub fn run(config: Config) {
     let pattern = create_glob_pattern(config.work_directory, &config.file_ext);
     let files = find_files(&pattern);
-    if files.is_empty() {
-        println!("Didn't find any files with {} extension.", &config.file_ext);
+    if let None = files {
+        eprintln!("Didn't find any files with {} extension.", &config.file_ext);
         process::exit(1);
     }
     if !&config.output_directory.exists() {
         fs::create_dir(&config.output_directory).unwrap();
     }
-    copy_files(files, config.output_directory);
+    move_files(files.unwrap(), config.output_directory);
 }
 
 fn create_glob_pattern(path: PathBuf, extension: &str) -> String {
@@ -42,20 +44,20 @@ fn create_glob_pattern(path: PathBuf, extension: &str) -> String {
     pattern
 }
 
-fn find_files(pattern: &str) -> Vec<PathBuf> {
+fn find_files(pattern: &str) -> Option<Vec<PathBuf>> {
     match glob(pattern) {
-        Ok(iter) => iter
+        Ok(iter) => Some(iter
             .map(|path| path.unwrap())
             .filter(|path| path.is_file())
-            .collect(),
+            .collect()),
         Err(err) => {
-            println!("Error: {}", err);
-            Vec::new()
+            eprintln!("Error: {}", err);
+            None
         }
     }
 }
 
-fn copy_files(files: Vec<PathBuf>, path: PathBuf) {
+fn move_files(files: Vec<PathBuf>, path: PathBuf) {
     files.iter().for_each(|file| {
         let string = (*file).file_name().unwrap();
         let mut output_path = path.clone();
