@@ -27,7 +27,7 @@ pub struct Config {
 pub fn run(config: Config) {
     let pattern = create_glob_pattern(config.work_directory, &config.file_ext);
     let files = find_files(&pattern);
-    if let None = files {
+    if files.is_none() {
         eprintln!("Didn't find any files with {} extension.", &config.file_ext);
         process::exit(1);
     }
@@ -46,10 +46,11 @@ fn create_glob_pattern(path: PathBuf, extension: &str) -> String {
 
 fn find_files(pattern: &str) -> Option<Vec<PathBuf>> {
     match glob(pattern) {
-        Ok(iter) => Some(iter
-            .map(|path| path.unwrap())
-            .filter(|path| path.is_file())
-            .collect()),
+        Ok(iter) => Some(
+            iter.map(|path| path.unwrap())
+                .filter(|path| path.is_file())
+                .collect(),
+        ),
         Err(err) => {
             eprintln!("Error: {}", err);
             None
